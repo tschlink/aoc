@@ -17,7 +17,15 @@ typedef struct
 {
     Point first;
     Point second;
+    char dir;
+    int pre_steps;
 } Line;
+
+typedef struct
+{
+    Point p;
+    int steps;
+} SteppedPoint;
 
 void printp(Point p)
 {
@@ -65,6 +73,7 @@ Line* getLines(char **instr, int nb_instr)
     Line* lines = malloc(sizeof(Line) * nb_instr);
     Point first = {0, 0};
     Point second = first;
+    int total_steps = 0;
 
     for(int i = 0; *(instr + i); i++)
     {
@@ -89,8 +98,11 @@ Line* getLines(char **instr, int nb_instr)
 
         (*(lines + i)).first = first;
         (*(lines + i)).second = second;
+        (*(lines + i)).dir = dir;
+        (*(lines + i)).pre_steps = total_steps;
         //print_points(*(lines + i));
 
+        total_steps += steps;
         first.x = second.x;
         first.y = second.y;
         free(*(instr + i));
@@ -113,20 +125,58 @@ Point* make_point(int x, int y)
     return p;
 }
 
-Point* line_intersection(Line line1, Line line2)
+SteppedPoint* make_stepped_point(int x, int y, int steps)
+{
+    SteppedPoint *sp = malloc(sizeof(SteppedPoint));
+    sp->p = (Point){x, y};
+    sp->steps = steps;
+    return sp;
+}
+
+SteppedPoint* line_intersection(Line line1, Line line2)
 {
     Point p1 = line1.first, p2 = line1.second, p3 = line2.first, p4 = line2.second;
 
     if(p1.x > p2.x) swap(&p1, &p2);
     if(p3.y > p4.y) swap(&p3, &p4);
 
-    if(p1.y == p2.y && p3.x == p4.x)
+    if(p1.y == p2.y && p3.x == p4.x) // line1 is horizontal
     {
 
         if((p1.x < p3.x && p2.x > p3.x)
         && (p3.y < p1.y && p4.y > p1.y))
         {
-            return make_point(p3.x, p1.y);
+            int line1_steps;
+            int line2_steps;
+            if(line1.dir == 'R')
+            {
+                line1_steps = line1.pre_steps + abs(line2.first.x - line1.first.x);
+            }
+            else if(line1.dir == 'L')
+            {
+                line1_steps = line1.pre_steps + abs(line1.first.x - line2.first.x);
+            }
+            else
+            {
+                printf("Found illegal dir %c while looking at horizontal line!\n", line1.dir);
+                exit(1);
+            }
+
+            if(line2.dir == 'U')
+            {
+                line2_steps = line2.pre_steps + abs(line1.first.y - line2.first.y);
+            }
+            else if(line2.dir == 'D')
+            {
+                line2_steps = line2.pre_steps + abs(line2.first.y - line1.first.y);
+            }
+            else
+            {
+                printf("Found illegal dir %c while looking at horizontal line!\n", line2.dir);
+                exit(1);
+            }
+
+            return make_stepped_point(p1.x, p3.y, line1_steps + line2_steps);
         }
     }
     else if(p1.x == p2.x && p3.y == p4.y)
@@ -134,13 +184,42 @@ Point* line_intersection(Line line1, Line line2)
         if((p1.y < p3.y && p2.y > p3.y)
         && (p3.x < p1.x && p4.x > p1.x))
         {
-            return make_point(p1.x, p3.y);
+            int line1_steps;
+            int line2_steps;
+            if(line1.dir == 'U')
+            {
+                line1_steps = line1.pre_steps + abs(line2.first.y - line2.first.y);
+            }
+            else if(line1.dir == 'D')
+            {
+                line1_steps = line1.pre_steps + abs(line1.first.y - line2.first.y);
+            }
+            else
+            {
+                printf("Found illegal dir %c while looking at horizontal line!\n", line1.dir);
+                exit(1);
+            }
+
+            if(line2.dir == 'R')
+            {
+                line2_steps = line2.pre_steps + abs(line1.first.x - line2.first.x);
+            }
+            else if(line2.dir == 'L')
+            {
+                line2_steps = line2.pre_steps + abs(line2.first.x - line1.first.x);
+            }
+            else
+            {
+                printf("Found illegal dir %c while looking at horizontal line!\n", line2.dir);
+                exit(1);
+            }
+            return make_stepped_point(p1.x, p3.y, line1_steps + line2_steps);
         }
     }
     return 0;
 }
 
-int line_intersections(Point points[], Line* list1, int nb1, Line* list2, int nb2)
+int line_intersections(SteppedPoint points[], Line* list1, int nb1, Line* list2, int nb2)
 {
     Line *tmp1 = list1, *tmp2 = list2;
 
@@ -154,7 +233,7 @@ int line_intersections(Point points[], Line* list1, int nb1, Line* list2, int nb
             Line l1 = *(tmp1+i);
             Line l2 = *(tmp2+j);
             if(l1.first.x == 0 && l1.first.y == 0 && l2.first.x == 0 && l2.first.y == 0) continue;
-            Point *p = line_intersection(*(tmp1+i), *(tmp2+j));
+            SteppedPoint *p = line_intersection(*(tmp1+i), *(tmp2+j));
             if(p)
             {
                 points[icount] = *p;
@@ -180,15 +259,15 @@ int main(void)
     Line* w1_lines = getLines(w1list, w1c);
     Line* w2_lines = getLines(w2list, w2c);
 
-    Point intersects[50000];
+    SteppedPoint intersects[50000];
     int isec_count = line_intersections(intersects, w1_lines, w1c, w2_lines, w2c);
 
     int shortest_dist = 100000;
     for(int i = 0; i < isec_count; i++)
     {
-        Point p = intersects[i];
-        printp(p);
-        int dist = abs(p.x) + abs(p.y);
+        SteppedPoint p = intersects[i];
+        //printp(p.p);
+        int dist = p.steps;
         if(dist < shortest_dist) shortest_dist = dist;
     }
     printf("shortest distance: %d\n", shortest_dist);
