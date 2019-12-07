@@ -66,13 +66,12 @@ int compute(int input[], int length)
 {
     int numbers[length];
     copyArray(input, numbers, length);
-    int idx;
-
-    idx = 0;
+    int idx = 0;
 
     while(idx < length)
     {
         int instr = numbers[idx];
+        printf("Instruction: %d\n", instr);
         if (instr % 100 == 99) break;
 
         int opcode, param_mode, param_modes;
@@ -81,7 +80,7 @@ int compute(int input[], int length)
         param_modes = instr / 100; //get everything preceeding opcode
 
         int modes[3] = {0};
-        if(param_mode == 1)
+        if(param_modes)
         {
             for(int i = 0; param_modes; i++)
             {
@@ -99,15 +98,18 @@ int compute(int input[], int length)
                 op2 = numbers[idx+2];
                 op3 = numbers[idx+3];
 
-                if(opcode == 1) numbers[op3] = (modes[0] ? numbers[op1] : op1) + (modes[1] ? numbers[op2] : op2);
-                if(opcode == 2) numbers[op3] = (modes[0] ? numbers[op1] : op1) * (modes[1] ? numbers[op2] : op2);
+                printf("op: %d, mode: %d, op1: %d, op2: %d, op3: %d\n", opcode, param_mode, op1, op2, op3);
+
+                if(opcode == 1) numbers[op3] = (modes[0] ? op1 : numbers[op1]) + (modes[1] ? op2 : numbers[op2]);
+                if(opcode == 2) numbers[op3] = (modes[0] ? op1 : numbers[op1]) * (modes[1] ? op2 : numbers[op2]);
                 idx += 4;
                 break;
             case 3:
                 op1 = 0;
+                op2 = numbers[idx+1];
                 success = scanf("%d", &op1);
-                printf("Read %d\n", op1);
-                if(success) numbers[idx+1] = op1;
+                printf("%d: Read %d\n", success, op1);
+                if(success) numbers[op2] = op1;
                 else
                 {
                     printf("Error while reading form stdin\n");
@@ -115,9 +117,9 @@ int compute(int input[], int length)
                 }
                 idx += 2;
                 break;
-            case 4: 
+            case 4:
                 op1 = numbers[idx+1];
-                printf("%d\n", op1);
+                printf("%d\n", numbers[op1]);
                 idx += 2;
                 break;
             default:
