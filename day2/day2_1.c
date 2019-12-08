@@ -3,9 +3,8 @@
 #include <string.h>
 #include <assert.h>
 
-char** split(char *str, const char delim) 
+char** split(char *str, const char delim)
 {
-
     char ** result = NULL;
     size_t count = 0;
     char *tmp = str;
@@ -13,9 +12,9 @@ char** split(char *str, const char delim)
     char delimiter[2];
     delimiter[0] = delim;
     delimiter[1] = '\0'; //or just 0?
-    
+
     // count number of elements with moving pointer
-    while(*tmp) 
+    while(*tmp)
     {
         if(delim == *tmp)
         {
@@ -58,7 +57,7 @@ int main(void) {
     int numbers[121];
 
     tokens = split(input, ',');
-    
+
     if(tokens)
     {
         int i;
@@ -91,7 +90,7 @@ int main(void) {
         int op1 = numbers[idx+1];
         int op2 = numbers[idx+2];
         int op3 = numbers[idx+3];
-        
+
         if(opc == 1) numbers[op3] = numbers[op1] + numbers[op2];
         if(opc == 2) numbers[op3] = numbers[op1] * numbers[op2];
 

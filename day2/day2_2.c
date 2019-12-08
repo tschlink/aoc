@@ -5,7 +5,6 @@
 
 char** split(char *str, const char delim)
 {
-
     char ** result = NULL;
     size_t count = 0;
     char *tmp = str;
