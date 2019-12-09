@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <sys/types.h>
 
 char *strdup(const char *s);
@@ -132,8 +133,14 @@ Orbit_Tree* createNode(char *str)
     return tree;
 }
 
-void addChild(Orbit_Tree tree, char *str, Orbit orbit)
+void addChild(Orbit_Tree *tree, Orbit *orbit)
 {
+    /*assert(0 == strcmp(tree->planet, orbit->center));
+    Orbit_Tree *child = createNode(strdup(orbit->orbitee));
+
+    child->parent = tree;
+    parent->child_length += 1;
+*/
 }
 
 Orbit_Tree* findNode(Orbit_Tree *root, char* str)
@@ -147,9 +154,16 @@ Orbit_Tree* findNode(Orbit_Tree *root, char* str)
         Orbit_Tree *tmp = findNode((root->children + i), str);
         if(tmp != NULL) return tmp;
     }
+
     return NULL;
 }
 
+void buildTree(Orbit_Tree *root, Orbit *orbits, int length)
+{
+    for(int i = 0; i < 2; i++)
+    {
+    }
+}
 int main(void)
 {
     int orbit_nbr = 0;
@@ -157,9 +171,6 @@ int main(void)
 
     Orbit_Tree *root = createNode("COM");
 
-    for(int i = 0; i < orbit_nbr; i++)
-    {
-    }
 
     return 0;
 }
