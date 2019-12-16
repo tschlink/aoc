@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define IASIZE(x) (sizeof(x) / sizeof(int))
+#define IASIZE(x) (sizeof(x) / sizeof(long))
 #define DEBUG 0
 
 size_t split(char *str, const char delim, char*** result)
