@@ -74,7 +74,7 @@ Card :: struct {
 }
 
 part2 :: proc() {
-    input, ok := os.read_entire_file("example.txt")
+    input, ok := os.read_entire_file("input.txt")
     if !ok do panic("Failed to read input file")
     defer delete(input)
 
@@ -118,7 +118,6 @@ part2 :: proc() {
     }
 
     for card, idx in &cards {
-        fmt.printf("%d:   %v\n", idx+1, card)
         if card.points == -1 {
             card.points = card_count(idx, cards)
         }
@@ -128,7 +127,8 @@ part2 :: proc() {
     fmt.println(total)
 }
 
-card_count :: proc(idx: int, cards: []Card) -> int {
+card_count :: proc(idx: int, cards: []Card, lvl := 0) -> int {
+    total := 0
     card_points := 0
 
     for i in cards[idx].winning_numbers {
@@ -138,16 +138,13 @@ card_count :: proc(idx: int, cards: []Card) -> int {
             }
         }
     }
-    //fmt.println(card_points)
+    indent := strings.repeat("\t", lvl)
 
-    if card_points > 0 {
-        for i in 1..<card_points {
-            fmt.printf("Counting cards for Card %d\n", idx + 1)
-            card_points += card_count(idx + i, cards)
-        }
+    for i in 0..<card_points {
+        total += card_count(idx + i + 1, cards, lvl + 1)
     }
 
-    card_points += 1 // count itself
+    total += 1 // count itself
 
-    return card_points
+    return total
 }
