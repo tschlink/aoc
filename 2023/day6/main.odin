@@ -26,6 +26,10 @@ example_race_p2 := [?]Race {
 input_race_p2 := [?]Race {
     {52947594, 426137412791216},
 }
+
+// This could be optimized easily by implementing a binary search approach where
+// we approach the lower and upper bounds incrementally.
+// But for such small numbers, bruteforcing works well enough
 main :: proc() {
     res := 1
     for race, idx in input_race_p2 {
