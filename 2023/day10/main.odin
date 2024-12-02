@@ -188,7 +188,7 @@ count_insides :: proc(lines: []string) -> int {
 
 remove_pipes :: proc(lines: []string, start_replacement: u8, visited: []Vec2) {
     lines := lines
-    for line, j in &lines {
+    for &line, j in lines {
         nstr := make([]u8, len(line))
         for r, i in line {
             if r == 'S' {

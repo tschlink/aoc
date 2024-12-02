@@ -48,6 +48,10 @@ main :: proc() {
     fmt.println(empty_cols)
     fmt.println(empty_rows)
 
+    switch {
+        case true: fallthrough
+        case false:
+    }
     // add expanded space to galaxy coords
     for g in &galaxies {
         dx := 0
