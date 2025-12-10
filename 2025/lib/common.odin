@@ -13,3 +13,9 @@ read_lines :: proc(path: string, alloc := context.allocator) -> []string {
 
     return lines
 }
+
+print_array :: proc(arr: []$T) {
+    for i in arr {
+        fmt.println(i)
+    }
+}
