@@ -5,13 +5,15 @@ import "core:strings"
 import "core:strconv"
 import "core:slice"
 
+import "core:testing"
+
 import "../lib"
 
 Range :: [2]int
 
 main :: proc() {
 
-    lines := lib.read_lines("sample.txt")
+    lines := lib.read_lines("input.txt")
 
     ranges := make([dynamic]Range)
 
@@ -35,7 +37,9 @@ main :: proc() {
         if is_in_range(n, ranges[:]) do total += 1
     }
 
-    fmt.println("total:", total)
+    fmt.println("part 1 total:", total)
+
+    fmt.println("rizan count", count_rizan(ranges[:]))
 
     consolidated := consolidate_ranges(ranges[:])
 
@@ -51,7 +55,6 @@ main :: proc() {
         con_count = len(consolidated)
     }
     fmt.println(iter_count)
-    //if iter_count > 0 do panic("AAAAHHH")
 
     slice.sort_by(consolidated, proc(a, b: Range) -> bool { return a.x < b.x })
 
@@ -117,4 +120,32 @@ consolidate_ranges :: proc(ranges: []Range) -> []Range {
     }
 
     return consolidates[:]
+}
+
+count_rizan :: proc(ranges: []Range) -> int {
+    count := 0
+    for r, i in ranges {
+        count += r.y-r.x+1
+
+        sum := 0
+        for s, j in ranges[:i] {
+            sum += intersect(s, r)
+        }
+        count -= sum
+    }
+    return count
+}
+
+intersect :: proc(s, r: Range) -> int {
+    start := max(s.x, r.x)
+    end   := min(s.y, r.y)
+    if start <= end do return end - start + 1
+    return 0
+}
+
+@test
+intersect_test :: proc(t: ^testing.T) {
+    testing.expect(t, intersect({1, 2},{3, 4}) == 0)
+    testing.expect(t, intersect({1, 2},{2, 4}) == 1)
+    testing.expect(t, intersect({1, 3},{2, 4}) == 2)
 }
